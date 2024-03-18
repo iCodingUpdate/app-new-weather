@@ -2,10 +2,11 @@
   max-width: 600px;
   margin: 30px auto;
   padding: 15px;
-  background-color: #f1f1f1;
+  background-color: #fff;
 }
 
 .App footer {
   font-size: 11px;
   margin: 10px 0;
+  text-align: center;
 }

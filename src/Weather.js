@@ -9,16 +9,22 @@ export default function Weather(props) {
   const [city, setCity] = useState(props.defaultCity);
 
   function handleResponse(response) {
+
+    const date = new Date( ( response.data.dt + response.data.timezone ) * 1000 + new Date().getTimezoneOffset() * 60 * 1000 );
+
     setWeatherData({
       ready: true,
       coordinates: response.data.coord,
       temperature: response.data.main.temp,
       humidity: response.data.main.humidity,
-      date: new Date(response.data.dt * 1000),
+      //date: new Date(response.data.dt * 1000),
+      date: date,
+      day: response.data.dt > response.data.sys.sunrise && response.data.dt < response.data.sys.sunset,
       description: response.data.weather[0].description,
       icon: response.data.weather[0].icon,
       wind: response.data.wind.speed,
       city: response.data.name,
+      weather: response.data.weather[0].description
     });
   }
 
@@ -32,14 +38,26 @@ export default function Weather(props) {
   }
 
   function search() {
-    const apiKey = "5f472b7acba333cd8a035ea85a0d4d4c";
+    const apiKey = "04bde8cc7f569f7c5603cdbc6deb89a3";
     let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
     axios.get(apiUrl).then(handleResponse);
   }
 
+  function weatherClasses() {
+    const classes = ['Weather'];
+    const weather = weatherData.weather ? weatherData.weather.replace(' ', '-') : '';
+
+    classes.push(weather);
+
+    if ( ! weatherData.day ) {
+      classes.push('night');
+    }
+    return classes.join(' ');
+  }
+
   if (weatherData.ready) {
     return (
-      <div className="Weather">
+      <div className={weatherClasses()}>
         <form onSubmit={handleSubmit}>
           <div className="row">
             <div className="col-9">
@@ -66,6 +84,8 @@ export default function Weather(props) {
     );
   } else {
     search();
-    return "Loading...";
+    return (
+      <p className="text-center">Loading...</p>
+    );
   }
 }
